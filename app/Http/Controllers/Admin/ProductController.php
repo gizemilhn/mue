@@ -69,8 +69,8 @@ class ProductController extends Controller
     public function view_product()
     {
 
-        $product = Product::paginate(5);
-        return view('admin.products.index', compact('product'));
+        $products = Product::paginate(5);
+        return view('admin.products.index', compact('products'));
     }
 
     public function delete_product($id)
@@ -135,7 +135,7 @@ class ProductController extends Controller
             }
         }
         toastr()->closeButton()->addSuccess('Ürün başarıyla güncellendi.');
-        return redirect()->route('admin.product.index', ['page' => request()->input('page', 1)]);
+        return redirect()->route('admin.products.index', ['page' => request()->input('page', 1)]);
 
     }
 
@@ -160,12 +160,20 @@ class ProductController extends Controller
     public function product_search(Request $request)
     {
         $search = $request->input('search', '');
-        $product = Product::where('name', 'like', '%' . $search . '%')
-            ->orWhere('category', 'like', '%' . $search . '%')
-            ->paginate(5);
-        $product->appends(['search' => $search]);
+        $query = Product::query();
 
-        return view('admin.products.index', compact('product'));
+        if($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('category', 'like', '%' . $search . '%');
+            });
+        }
+
+        $products = $query->paginate(5);
+        $products->appends(['search' => $search]);
+
+        return view('admin.products.index', compact('products'));
     }
 
     public function updateProductStocks()

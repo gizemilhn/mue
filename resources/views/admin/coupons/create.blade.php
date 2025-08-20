@@ -58,13 +58,13 @@
                             </div>
                         </div>
 
-                        <!-- Usage Limit and Expiry Date -->
+                        <!-- Minimum Amount and Expiry Date -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Kullanım Limiti</label>
-                                <input type="number" name="usage_limit"
+                                <label class="block text-sm font-medium text-gray-700">Minimum Sipariş Tutarı (₺)</label>
+                                <input type="number" name="min_amount"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                       placeholder="Boş bırakılırsa sınırsız">
+                                       placeholder="Minimum uygulanabilir tutar" min="0" step="0.01">
                             </div>
                             <div class="space-y-2">
                                 <label class="block text-sm font-medium text-gray-700">Son Kullanma Tarihi</label>
@@ -73,15 +73,23 @@
                             </div>
                         </div>
 
-                        <!-- Specific User -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700">Özel Kullanıcı</label>
-                            <select name="user_id" class="w-full select2 rounded p-2 border">
-                                <option value="">Tüm Kullanıcılar</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-                                @endforeach
-                            </select>
+                        <!-- Usage Limit and Specific User -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Kullanım Limiti</label>
+                                <input type="number" name="usage_limit"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Boş bırakılırsa sınırsız">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Özel Kullanıcı</label>
+                                <select name="user_id" class="w-full select2 rounded p-2 border">
+                                    <option value="">Tüm Kullanıcılar</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Status Toggle -->
@@ -146,5 +154,4 @@
             });
         });
     </script>
-
 @endpush

@@ -11,9 +11,24 @@ use Illuminate\Http\Request;
 class ContactController extends Controller
 {
 
-    public function index()
+    public function index(request $request)
     {
-        $contacts = Contact::latest()->paginate(10);
+        $query = Contact::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $query->whereDate('created_at', $date);
+        }
+
+        $contacts = $query->paginate(10);
+
         return view('admin.contacts.index', compact('contacts'));
     }
 

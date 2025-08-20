@@ -1,7 +1,7 @@
 @extends('admin.index')
 @section('content')
-    <div class="p-6">
-        <div class="bg-white rounded-lg shadow">
+    <div class="p-6 min-h-screen">
+        <div class="bg-white rounded-lg shadow p-6">
             <div class="px-6 pt-6 pb-4 border-b border-gray-200">
                 <div class="flex justify-between items-center">
                     <div>
@@ -34,7 +34,7 @@
                 </div>
             @endif
 
-            <div class="overflow-x-auto px-6 pb-6">
+            <div class="overflow-x-auto  rounded-lg shadow-sm ">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
@@ -50,16 +50,16 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($product as $products)
+                    @foreach($products as $product)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{$products->name}}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{!!Str::limit($products->description,25)!!}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$products->category}}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$products->price}}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{$product->name}}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{!!Str::limit($product->description,25)!!}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$product->category}}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$product->price}}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">
-                                @if($products->sizes->count())
+                                @if($product->sizes->count())
                                     <div class="space-y-1">
-                                        @foreach($products->sizes as $size)
+                                        @foreach($product->sizes as $size)
                                             <div>{{ $size->name }} → {{ $size->pivot->stock }}</div>
                                         @endforeach
                                     </div>
@@ -68,28 +68,28 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if ($products->featuredImage)
-                                    <img src="{{ asset($products->featuredImage->image_path) }}"
+                                @if ($product->featuredImage)
+                                    <img src="{{ asset($product->featuredImage->image_path) }}"
                                          class="h-32 w-24 object-cover rounded-md"
-                                         alt="{{ $products->name }}">
+                                         alt="{{ $product->name }}">
                                 @else
                                     <span class="text-gray-400">No Image</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        {{ $products->is_published ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $products->is_published ? 'Satışta' : 'Satış Dışı' }}
+                                        {{ $product->is_published ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        {{ $product->is_published ? 'Satışta' : 'Satış Dışı' }}
                                     </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('update_product', ['id' => $products->id]) }}?page={{ request()->input('page', 1) }}"
+                                <a href="{{ route('update_product', ['id' => $product->id]) }}?page={{ request()->input('page', 1) }}"
                                    class="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors">
                                     Düzenle
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{route('delete_product',$products->id)}}"
+                                <a href="{{route('delete_product',$product->id)}}"
                                    onclick="confirmation(event)"
                                    class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
                                     Sil
@@ -101,8 +101,8 @@
                 </table>
             </div>
 
-            <div class="px-6 pb-6">
-                {{ $product->onEachSide(1)->links() }}
+            <div class="px-6 pb-6 mt-4">
+                {{ $products->onEachSide(1)->links() }}
             </div>
         </div>
     </div>

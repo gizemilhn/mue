@@ -2,11 +2,8 @@
 @section('content')
     <div class="p-6">
         <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-2xl font-bold text-gray-800">Kuponlar</h2>
-                <a href="{{ route('admin.coupons.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
-                    Yeni Kupon Ekle
-                </a>
             </div>
 
             @if(session('success'))
@@ -15,13 +12,54 @@
                 </div>
             @endif
 
-            <div class="overflow-x-auto">
+            <form action="{{ route('admin.coupons.index') }}" method="GET" class="mb-6 py-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Kupon Kodu</label>
+                        <input
+                            type="text"
+                            name="search"
+                            id="search"
+                            value="{{ request('search') }}"
+                            placeholder="Kupon kodu..."
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-md"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="is_active" class="block text-sm font-medium text-gray-700 mb-1">Durum</label>
+                        <select name="is_active" id="is_active" class="block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-md rounded-md shadow-sm">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Aktif</option>
+                            <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Pasif</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end space-x-2">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-md font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Filtrele
+                        </button>
+                        @if(request()->hasAny(['search', 'is_active']))
+                            <a href="{{ route('admin.coupons.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Temizle
+                            </a>
+                        @endif
+                    </div>
+                    <div class="flex items-end justify-end ">
+                        <a href="{{ route('admin.coupons.create') }}" class=" bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
+                            Yeni Kupon Ekle
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <div class="overflow-x-auto rounded-lg shadow-sm">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kod</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tür</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Değer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Minimum Tutar</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kullanım Limiti</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Geçerlilik</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktif?</th>
@@ -41,6 +79,9 @@
                                 @else
                                     {{ $coupon->discount_value }}₺
                                 @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{$coupon->min_amount}}₺
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $coupon->usage_limit ?? '-' }}

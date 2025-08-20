@@ -4,12 +4,13 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Coupon;
 use App\Models\OrderProducts;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Address;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+
+use Illuminate\Support\Facades\Session;
+use Stripe\Stripe;
 
 
 class CheckoutController extends Controller
@@ -98,14 +99,33 @@ class CheckoutController extends Controller
         $order = null;
 
         DB::transaction(function () use ($user, $carts, $totalFromStripe, $shippingFee, $address_id, &$order, $paymentIntentId) {
+            // Sipariş oluşturma
             $order = $user->orders()->create([
                 'total_price' => $totalFromStripe,
                 'shipping_price' => $shippingFee,
                 'status' => 'pending',
                 'address_id' => $address_id,
                 'payment_id' => $paymentIntentId,
+                'coupon_id' => session('applied_coupon.id') ?? null,
+                'discount_amount' => session('applied_coupon.discount') ?? 0
             ]);
 
+            // Kupon işlemleri
+            if (session('applied_coupon')) {
+                $coupon = Coupon::find(session('applied_coupon.id'));
+
+                // Kupon kullanımını kaydet
+                $coupon->markAsUsed(
+                    $user->id,
+                    $order->id,
+                    session('applied_coupon.discount')
+                );
+
+                // Session'dan temizle
+                session()->forget('applied_coupon');
+            }
+
+            // Sipariş ürünlerini ekleme
             foreach ($carts as $cart) {
                 OrderProducts::create([
                     'order_id' => $order->id,
@@ -115,6 +135,7 @@ class CheckoutController extends Controller
                     'price' => $cart->product->price,
                 ]);
 
+                // Stok güncelleme
                 if ($cart->size_id) {
                     DB::table('product_size')
                         ->where('product_id', $cart->product_id)
@@ -126,6 +147,7 @@ class CheckoutController extends Controller
                 $cart->delete();
             }
         });
+
         $user->notify(new \App\Notifications\OrderPlaced($order));
         return redirect()->route('user.order.details', $order->id);
     }

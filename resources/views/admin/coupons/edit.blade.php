@@ -1,9 +1,7 @@
 @extends('admin.index')
 @section('content')
-    <div class="p-4 ">
+    <div class="p-4">
         <div class="p-4">
-
-
             @if(session('success'))
                 <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
                     {{ session('success') }}
@@ -58,8 +56,8 @@
                             <div class="space-y-2">
                                 <label class="block text-sm font-medium text-gray-700">İndirim Değeri</label>
                                 <div class="flex rounded-md shadow-sm">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
-                                      id="discount-symbol">{{ old('discount_type', $coupon->discount_type) == 'percent' ? '%' : '₺' }}</span>
+                                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
+                                          id="discount-symbol">{{ old('discount_type', $coupon->discount_type) == 'percent' ? '%' : '₺' }}</span>
                                     <input type="number" name="discount_value" id="discount_value"
                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            value="{{ old('discount_value', $coupon->discount_value) }}" required min="1">
@@ -67,13 +65,13 @@
                             </div>
                         </div>
 
-                        <!-- Usage Limit and Expiry Date -->
+                        <!-- Minimum Amount and Expiry Date -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Kullanım Limiti</label>
-                                <input type="number" name="usage_limit"
+                                <label class="block text-sm font-medium text-gray-700">Minimum Sipariş Tutarı (₺)</label>
+                                <input type="number" name="min_amount"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                       value="{{ old('usage_limit', $coupon->usage_limit) }}" placeholder="Boş bırakılırsa sınırsız">
+                                       value="{{ old('min_amount', $coupon->min_amount) }}" placeholder="Minimum uygulanabilir tutar" min="0" step="0.01">
                             </div>
                             <div class="space-y-2">
                                 <label class="block text-sm font-medium text-gray-700">Son Kullanma Tarihi</label>
@@ -83,17 +81,25 @@
                             </div>
                         </div>
 
-                        <!-- Specific User -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700">Özel Kullanıcı</label>
-                            <select name="user_id" class="w-full select2  rounded p-2 border">
-                                <option value="">Tüm Kullanıcılar</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id', $coupon->user_id) == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }} ({{ $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+                        <!-- Usage Limit and Specific User -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Kullanım Limiti</label>
+                                <input type="number" name="usage_limit"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       value="{{ old('usage_limit', $coupon->usage_limit) }}" placeholder="Boş bırakılırsa sınırsız">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Özel Kullanıcı</label>
+                                <select name="user_id" class="w-full select2 rounded p-2 border">
+                                    <option value="">Tüm Kullanıcılar</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}" {{ old('user_id', $coupon->user_id) == $user->id ? 'selected' : '' }}>
+                                            {{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Status Toggle -->
@@ -123,7 +129,6 @@
 @endsection
 
 @push('scripts')
-
     <script>
         $(document).ready(function () {
             // Select2 initialization
@@ -159,5 +164,4 @@
             });
         });
     </script>
-
 @endpush

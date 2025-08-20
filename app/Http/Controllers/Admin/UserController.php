@@ -11,9 +11,30 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function users()
+    public function users(request $request)
     {
-        $users = User::all();
+        $query = User::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('surname', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('is_active')) {
+
+            if ($request->input('is_active') == '1') {
+                $query->where('is_active', $request->input('is_active'));
+            } elseif ($request->input('is_active') == '0') {
+                $query->where('is_active', 0);
+            }
+        }
+
+        $users = $query->paginate(10);
+
         return view('admin.users.index', compact('users'));
     }
     public function createUser()

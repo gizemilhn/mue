@@ -4,7 +4,9 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Coupon;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -82,16 +84,22 @@ class CartController extends Controller
             $userCarts = Cart::with('product')->where('user_id', Auth::id())->get();
 
             $totalQuantity = $userCarts->sum('quantity');
-
             $totalPrice = $userCarts->sum(function ($cart) {
                 return $cart->product->price * $cart->quantity;
             });
+
+            // Kupon indirimini ekleyelim
+            $discount = session('applied_coupon.discount') ?? 0;
+            $shippingCost = $totalPrice >= 750 ? 0 : 49.90;
+            $grandTotal = $totalPrice - $discount + ($totalPrice >= 750 ? 0 : $shippingCost);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Ürün miktarı güncellendi.',
                 'totalPrice' => number_format($totalPrice, 2),
                 'totalQuantity' => $totalQuantity,
+                'discount' => number_format($discount, 2),
+                'grandTotal' => number_format($grandTotal, 2)
             ]);
 
         } catch (\Exception $e) {
@@ -101,14 +109,84 @@ class CartController extends Controller
             ], 500);
         }
     }
-
     public function remove(Request $request)
     {
         $cartItem = Cart::find($request->cart_id);
         if ($cartItem) {
             $cartItem->delete();
+            if (session('applied_coupon')) {
+                $totalPrice = $this->calculateCartTotal();
+                $coupon = Coupon::find(session('applied_coupon.id'));
+
+                if ($coupon->min_amount && $totalPrice < $coupon->min_amount) {
+                    session()->forget('applied_coupon');
+                }
+            }
             return response()->json(['success' => true]);
         }
         return response()->json(['success' => false]);
     }
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate(['coupon_code' => 'required|string']);
+
+        $coupon = Coupon::where('code', $request->coupon_code)->first();
+
+        if (!$coupon) {
+            return back()->withErrors(['coupon' => 'Geçersiz kupon kodu.']);
+        }
+
+        $user = auth()->user();
+        $cartTotal = $this->calculateCartTotal();
+
+        if (!$coupon->canBeUsedBy($user, $cartTotal)) {
+            return back()->withErrors(['coupon' => 'Bu kuponu şu anda kullanamazsınız.']);
+        }
+
+        $discount = $coupon->discount_type == 'percent'
+            ? $cartTotal * ($coupon->discount_value / 100)
+            : $coupon->discount_value;
+
+        session(['applied_coupon' => [
+            'id' => $coupon->id,
+            'code' => $coupon->code,
+            'discount' => min($discount, $cartTotal),
+            'remaining_uses' => $coupon->remaining_uses
+        ]]);
+
+        return back()->with('success', 'Kupon başarıyla uygulandı.');
+    }
+
+    public function removeCoupon(Request $request)
+    {
+        session()->forget('applied_coupon');
+
+        return response()->json([
+            'success' => true,
+            'data' => $this->getUpdatedCartTotals()
+        ]);
+    }
+
+    private function calculateCartTotal()
+    {
+        return Cart::with('product')
+            ->where('user_id', auth()->id())
+            ->get()
+            ->sum(fn($item) => $item->product->price * $item->quantity);
+    }
+
+    private function getUpdatedCartTotals()
+    {
+        $total = $this->calculateCartTotal();
+        $shipping = $total >= 750 ? 0 : 49.90;
+
+        return [
+            'total' => number_format($total, 2),
+            'shipping' => number_format($shipping, 2),
+            'grand_total' => number_format($total + $shipping, 2)
+        ];
+    }
+
+
 }

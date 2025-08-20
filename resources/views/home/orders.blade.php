@@ -38,7 +38,17 @@
                                         <span class="badge bg-secondary">Bilinmiyor</span>
                                 @endswitch
                             </td>
-                            <td>{{ number_format($order->total_price, 2) }}₺</td>
+                            <td>
+                                @if($order->coupon)
+                                    <div class="mt-1 small text-success">
+                                        Kupon: {{ $order->coupon->code }}
+                                    </div>
+                                @endif{{ number_format($order->total_price, 2) }}₺
+                                @if($order->couponUsage)
+                                    <div class="small text-danger">
+                                        -{{ number_format($order->couponUsage->discount_amount, 2) }}₺ indirim
+                                    </div>
+                                @endif</td>
                             <td>
                                 <a href="{{ route('user.order.details', $order->id) }}" class="btn btn-info btn-sm rounded-2">Detaylar</a>
                                 @if($order->status == 'pending')

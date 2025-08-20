@@ -1,5 +1,6 @@
 @extends('admin.index')
 @section('content')
+    <div class="p-6  min-h-screen">
         <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-left">Kargo Takip</h2>
 
@@ -31,7 +32,7 @@
             </form>
 
             <!-- Shipping Table -->
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-lg shadow-sm">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
@@ -93,6 +94,7 @@
                 </table>
             </div>
         </div>
+    </div>
 @endsection
 @push('scripts')
     <script>

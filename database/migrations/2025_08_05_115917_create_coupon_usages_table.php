@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('coupon_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamp('used_at');
+
         });
     }
 

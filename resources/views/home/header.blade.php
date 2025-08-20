@@ -47,7 +47,7 @@
             </button>
             <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar">
                 <div class="offcanvas-header px-4 pb-0">
-                    <a class="navbar-brand ps-3" href="{{route('home')}}">
+                    <a class="navbar-brand ps-3" href="{{url('/')}}">
                         <img src="{{ asset('images/logo.png') }}" class="logo" alt="logo">
                     </a>
                     <button type="button" class="btn-close btn-close-black p-5" data-bs-dismiss="offcanvas"

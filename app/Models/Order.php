@@ -35,4 +35,13 @@ class Order extends Model
     public function returnRequest() {
         return $this->hasOne(ReturnRequest::class);
     }
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    public function couponUsage()
+    {
+        return $this->hasOne(CouponUsage::class,'order_id');
+    }
 }

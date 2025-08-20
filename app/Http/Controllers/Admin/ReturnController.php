@@ -15,20 +15,30 @@ class ReturnController extends Controller
     {
         $query = ReturnRequest::query()->with(['user', 'order']);
 
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
         }
 
-        if ($request->has('start_date') && $request->start_date != '') {
-            $query->whereDate('created_at', '>=', $request->start_date);
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->input('start_date'));
         }
 
-        if ($request->has('end_date') && $request->end_date != '') {
-            $query->whereDate('created_at', '<=', $request->end_date);
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->input('end_date'));
+        }
+
+        if ($request->filled('user_search')) {
+            $searchTerm = $request->input('user_search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('return_code', 'like', "%{$searchTerm}%");
+                $q->orWhereHas('user', function ($q2) use ($searchTerm) {
+                    $q2->where('name', 'like', "%{$searchTerm}%")
+                        ->orWhere('email', 'like', "%{$searchTerm}%");
+                });
+            });
         }
 
         $returns = $query->latest()->paginate(10);
-
         return view('admin.returns.index', compact('returns'));
     }
     public function show($id)

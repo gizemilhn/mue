@@ -9,9 +9,19 @@ use Illuminate\Http\Request;
 
 class CouponController extends Controller
 {
-    public function index()
-    {
-        $coupons = Coupon::latest()->paginate(10);
+    public function index( Request $request )
+    {   $query = Coupon::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('code', 'like', "%{$search}%");
+        }
+
+        if ($request->filled('is_active')) {
+            $query->where('is_active', (bool) $request->input('is_active'));
+        }
+
+        $coupons = $query->paginate(10);
 
         return view('admin.coupons.index', compact('coupons'));
     }
@@ -29,12 +39,13 @@ class CouponController extends Controller
             'code' => 'required|unique:coupons,code',
             'discount_type' => 'required|in:percent,amount',
             'discount_value' => 'required|numeric|min:0',
+            'min_amount' => 'nullable|numeric|min:0',
             'usage_limit' => 'nullable|integer|min:1',
             'expires_at' => 'nullable|date',
             'user_id' => 'nullable|exists:users,id',
             'is_active' => 'required|boolean',
         ]);
-
+        $validated['min_amount'] = $request->min_amount ?? 0;
         Coupon::create($validated);
         toastr()->closeButton()->success('Kupon başarıyla oluşturuldu.');
         return redirect()->route('admin.coupons.index');
@@ -52,12 +63,13 @@ class CouponController extends Controller
             'code' => 'required|unique:coupons,code,' . $coupon->id,
             'discount_type' => 'required|in:percent,amount',
             'discount_value' => 'required|numeric|min:0',
+            'min_amount' => 'nullable|numeric|min:0',
             'usage_limit' => 'nullable|integer|min:1',
             'expires_at' => 'nullable|date',
             'user_id' => 'nullable|exists:users,id',
             'is_active' => 'required|boolean',
         ]);
-
+        $validated['min_amount'] = $request->min_amount ?? 0;
         $coupon->update($validated);
         toastr()->closeButton()->success('Kupon başarıyla güncellendi.');
         return redirect()->route('admin.coupons.index');

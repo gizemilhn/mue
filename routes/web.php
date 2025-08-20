@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ShippingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\SearchController as AdminSearchController;
 
 use App\Http\Controllers\User\StripeController;
 use App\Http\Controllers\User\CheckoutController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\User\OrderController as UserOrderController;
 use App\Http\Controllers\User\ReturnRequestController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
+use App\Http\Controllers\User\CouponController as UserCouponController;
 
 use App\Http\Controllers\ContactController as HomeContactController;
 use App\Http\Controllers\HomeController;
@@ -45,11 +47,15 @@ Route::middleware('auth')->namespace('App\Http\Controllers\User')->group(functio
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
     Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+
+    Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
+    Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.removeCoupon');
+
     Route::get('/orders/{order}', [UserOrderController::class, 'orderDetails'])->name('user.order.details');
     Route::post('/user.order/{order}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
     Route::post('/return-request/{order}', [ReturnRequestController::class, 'store'])->name('return.request.store');
     Route::get('/orders', [UserOrderController::class, 'userOrders'])->name('user.orders');
-    Route::get('/coupons', [CouponController::class, 'index'])->name('user.coupons');
+    Route::get('/coupons', [UserCouponController::class, 'index'])->name('user.coupons');
     Route::get('/address', [AddressController::class, 'userAddress'])->name('user.address');
     Route::post('/address', [AddressController::class, 'storeAddress'])->name('user.address.store');
     Route::get('/edit_address/{id}/edit', [AddressController::class, 'editAddress'])->name('user.address.edit');
@@ -74,7 +80,9 @@ Route::middleware('auth')->namespace('App\Http\Controllers\User')->group(functio
 // Admin middleware grubu
 Route::middleware('auth')->middleware('admin')->middleware('verified')->prefix('admin')->namespace('App\Http\Controllers\Admin')->group(function () {
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('admin_home', [AdminController::class, 'admin_home']);
+
+
+    Route::get('/admin/global-search', [AdminSearchController::class, 'search'])->name('admin.global-search');
 
     Route::get('/admin/categories/main_category_index', [CategoryController::class, 'main_category_index'])->name('main.category.index');
     Route::post('/add_main_category', [CategoryController::class, 'add_main_category'])->name('add.main.category');
@@ -90,7 +98,7 @@ Route::middleware('auth')->middleware('admin')->middleware('verified')->prefix('
 
     Route::get('/admin/products/store', [AdminProductController::class, 'add_product'])->name('admin.products.store');
     Route::post('upload_product', [AdminProductController::class, 'upload_product'])->name('upload_product');
-    Route::get('/admin/products/index', [AdminProductController::class, 'view_product'])->name('admin.product.index');
+    Route::get('/admin/products/index', [AdminProductController::class, 'view_product'])->name('admin.products.index');
     Route::get('delete_product/{id}', [AdminProductController::class, 'delete_product'])->name('delete_product');
     Route::get('/admin/products/update/{id}', [AdminProductController::class, 'update_product'])->name('update_product');
     Route::post('edit_product/{id}', [AdminProductController::class, 'edit_product'])->name('edit_product');

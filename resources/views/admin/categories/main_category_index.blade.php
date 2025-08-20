@@ -34,7 +34,7 @@
 
             <!-- Main Categories Table -->
             <div class="px-6 pb-6">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto  rounded-lg shadow-sm">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>

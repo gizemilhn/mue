@@ -15,12 +15,12 @@
     <nav class="flex-1 overflow-y-auto px-4 py-6">
         <ul class="space-y-1.5 text-[15px] font-medium">
 
-            <!-- Single Menu Item -->
+            <!-- Dashboard -->
             <li>
                 <div class="{{ request()->is('admin.dashboard') ? 'bg-blue-50 border-l-4 border-blue-500' : '' }} rounded-lg">
                     <a href="{{ route('admin.dashboard') }}"
                        class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition rounded-lg">
-                        <i class="icon-home text-gray-600"></i>
+                        <x-icon name="home" class="text-gray-600" />
                         <span>Dashboard</span>
                     </a>
                 </div>
@@ -31,7 +31,7 @@
                 <button onclick="toggleMenu('categoriesCollapse')"
                         class="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-gray-100 transition">
                     <span class="flex items-center gap-3">
-                        <i class="icon-windows text-gray-600"></i>
+                        <x-icon name="categories" class="text-gray-600" />
                         <span>Categories</span>
                     </span>
                     <i class="fa fa-chevron-down text-xs text-gray-500"></i>
@@ -52,15 +52,15 @@
                 </ul>
             </li>
 
-            <!-- Tekli Menü Listesi (Loop ile) -->
+            <!-- Menü Listesi (Loop ile) -->
             @php
                 $menuItems = [
-                    ['title' => 'Users', 'route' => 'admin.users.index', 'icon' => 'icon-users'],
-                    ['title' => 'Orders', 'route' => 'admin.orders.index', 'icon' => 'icon-list'],
-                    ['title' => 'Shippings', 'route' => 'admin.shippings.index', 'icon' => 'icon-truck'],
-                    ['title' => 'Coupons', 'route' => 'admin.coupons.index', 'icon' => 'icon-tag'],
-                    ['title' => 'Returns', 'route' => 'admin.returns.index', 'icon' => 'icon-rotate-ccw'],
-                    ['title' => 'İletişim', 'route' => 'admin.contacts.index', 'icon' => 'icon-mail'],
+                    ['title' => 'Users', 'route' => 'admin.users.index', 'icon' => 'users'],
+                    ['title' => 'Orders', 'route' => 'admin.orders.index', 'icon' => 'orders'],
+                    ['title' => 'Shippings', 'route' => 'admin.shippings.index', 'icon' => 'truck'],
+                    ['title' => 'Coupons', 'route' => 'admin.coupons.index', 'icon' => 'tag'],
+                    ['title' => 'Returns', 'route' => 'admin.returns.index', 'icon' => 'undo'],
+                    ['title' => 'İletişim', 'route' => 'admin.contacts.index', 'icon' => 'contact'],
                 ];
             @endphp
 
@@ -69,7 +69,7 @@
                     <div class="{{ request()->routeIs($item['route']) ? 'bg-blue-50 border-l-4 border-blue-500' : '' }} rounded-lg">
                         <a href="{{ route($item['route']) }}"
                            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition rounded-lg">
-                            <i class="{{ $item['icon'] }} text-gray-600"></i>
+                            <x-icon :name="$item['icon']" class="text-gray-600" />
                             <span>{{ $item['title'] }}</span>
                         </a>
                     </div>
@@ -81,7 +81,7 @@
                 <button onclick="toggleMenu('productsCollapse')"
                         class="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-gray-100 transition">
                     <span class="flex items-center gap-3">
-                        <i class="icon-box text-gray-600"></i>
+                        <x-icon name="products" class="text-gray-600" />
                         <span>Products</span>
                     </span>
                     <i class="fa fa-chevron-down text-xs text-gray-500"></i>
@@ -94,7 +94,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.product.index') }}"
+                        <a href="{{ route('admin.products.index') }}"
                            class="block px-3 py-2 rounded-md hover:bg-gray-100 {{ request()->routeIs('admin.product.index') ? 'bg-blue-50 border-l-2 border-blue-500 font-semibold' : '' }}">
                             View Products
                         </a>
@@ -105,6 +105,7 @@
         </ul>
     </nav>
 </aside>
+
 <script>
     function toggleMenu(id) {
         const el = document.getElementById(id);
