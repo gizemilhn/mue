@@ -1,110 +1,147 @@
 @extends('home.layout')
 
 @section('content')
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
-    @if($errors->has('coupon'))
-        <div class="alert alert-danger">{{ $errors->first('coupon') }}</div>
-    @endif
 
-    <div class="cart-container d-flex">
-        <div class="cart-items w-75">
-            <h1 class="mb-4">Sepetiniz</h1>
+        @if(session('success'))
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
 
-            @if($carts->isEmpty())
-                <p>Sepetinizde ürün bulunmamaktadır.</p>
-            @else
-                <div class="cart-items-list">
-                    @foreach($carts as $cart)
-                        <div class="cart-item d-flex align-items-center mb-3 p-3">
-                            @if ($cart->product->featuredImage)
-                                <img src="{{ asset($cart->product->featuredImage->image_path) }}" width="100" alt="{{ $cart->product->name }}">
-                            @else
-                                <span>No Image</span>
-                            @endif
+        @if($errors->has('coupon'))
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                {{ $errors->first('coupon') }}
+            </div>
+        @endif
 
-                            <div class="ms-3">
-                                <div><strong>{{ $cart->product->name }}</strong></div>
-                                <div>Beden: {{ $cart->size->name }}</div>
+        <div class="flex flex-col lg:flex-row gap-8">
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Sepetiniz</h1>
 
-                                <div class="d-flex align-items-center mt-2">
-                                    <button class="btn btn-outline-secondary decrease-quantity rounded" data-cart-id="{{ $cart->id }}">-</button>
-                                    <input type="number" value="{{ $cart->quantity }}" id="quantity_{{ $cart->id }}"
-                                           class="form-control mx-2 quantity-input" min="1" style="width: 60px;">
-                                    <button class="btn btn-outline-secondary increase-quantity rounded" data-cart-id="{{ $cart->id }}">+</button>
+                @if($carts->isEmpty())
+                    <div class="text-center p-8 bg-gray-50 rounded-lg">
+                        <p class="text-gray-500 font-medium">Sepetinizde ürün bulunmamaktadır.</p>
+                    </div>
+                @else
+                    <div class="space-y-4">
+                        @foreach($carts as $cart)
+                            <div class="flex items-center p-4 bg-white rounded-lg shadow-sm">
+                                @if ($cart->product->featuredImage)
+                                    <img src="{{ asset($cart->product->featuredImage->image_path) }}" class="w-24 h-24 object-cover rounded-lg mr-4" alt="{{ $cart->product->name }}">
+                                @else
+                                    <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center mr-4">
+                                        <span class="text-gray-500 text-xs">Görsel Yok</span>
+                                    </div>
+                                @endif
+
+                                <div class="flex-1">
+                                    <h4 class="text-lg font-semibold text-gray-800">{{ $cart->product->name }}</h4>
+                                    <p class="text-sm text-gray-500">Beden: {{ $cart->size->name }}</p>
+                                    <div class="flex items-center mt-2 space-x-2">
+                                        <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold w-8 h-8 rounded-full transition-colors duration-200 decrease-quantity" data-cart-id="{{ $cart->id }}">-</button>
+                                        <input type="number" value="{{ $cart->quantity }}" id="quantity_{{ $cart->id }}"
+                                               class="w-16 text-center border border-gray-300 rounded-md py-1" min="1">
+                                        <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold w-8 h-8 rounded-full transition-colors duration-200 increase-quantity" data-cart-id="{{ $cart->id }}">+</button>
+                                    </div>
                                 </div>
+
+                                <strong class="text-xl font-bold text-green-600 ml-auto mr-4 md:mr-6">{{ number_format($cart->product->price, 2) }}₺</strong>
+
+                                <button class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200 remove-product" data-cart-id="{{ $cart->id }}">Sil</button>
                             </div>
-                                <strong class="ms-auto fs-5 text-success">{{ number_format($cart->product->price, 2) }}₺</strong>
-                            <button class="btn btn-danger ms-auto remove-product rounded-2" data-cart-id="{{ $cart->id }}">Sil</button>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            <div class="w-full md:w-full lg:w-1/3 p-6 bg-gray-100 rounded-lg shadow-lg">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4">Sepet Özeti</h4>
+
+                <form action="{{ route('cart.applyCoupon') }}" method="POST" class="mb-4">
+                    @csrf
+                    <div class="flex space-x-2">
+                        <input type="text" name="coupon_code" class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Kupon kodu" required>
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200">Uygula</button>
+                    </div>
+                </form>
+
+                @if(session('applied_coupon'))
+                    <div class="mb-4">
+                        <p class="text-sm font-medium text-gray-600">
+                            <strong>Kupon:</strong> {{ session('applied_coupon.code') }}
+                            <button class="text-red-500 hover:text-red-700 ml-2 remove-coupon" title="Kuponu Kaldır">
+                                <i class="fas fa-times"></i> Kaldır
+                            </button>
+                        </p>
+                        <p class="text-sm text-green-600 font-semibold discount-amount">
+                            <strong>İndirim:</strong> -{{ number_format(session('applied_coupon.discount'), 2) }}₺
+                        </p>
+                    </div>
+                @endif
+
+                @php
+                    $shippingCost = 49.90;
+                    $isFreeShipping = $totalPrice >= 750;
+                    $discount = session('applied_coupon.discount') ?? 0;
+                    $grandTotal = $totalPrice - $discount + (!$isFreeShipping ? $shippingCost : 0);
+                @endphp
+
+                <div class="border-t border-gray-300 pt-4 space-y-2">
+                    <p class="flex justify-between items-center text-gray-700"><strong>Toplam Tutar:</strong> <span id="totalPrice">{{ number_format($totalPrice, 2) }}₺</span></p>
+                    <p class="flex justify-between items-center text-gray-700"><strong>Toplam Adet:</strong> <span id="totalQuantity">{{ $totalQuantity }}</span></p>
+
+                    @if($isFreeShipping)
+                        <p class="flex justify-between items-center text-gray-700">
+                            <strong>Kargo:</strong>
+                            <span class="text-sm text-gray-500 line-through mr-2">{{ number_format($shippingCost, 2) }}₺</span>
+                            <span class="text-green-600 font-semibold">Ücretsiz</span>
+                        </p>
+                    @else
+                        <p class="flex justify-between items-center text-gray-700"><strong>Kargo:</strong> {{ number_format($shippingCost, 2) }}₺</p>
+                    @endif
+
+                    <p class="flex justify-between items-center text-xl font-bold text-gray-800 border-t border-gray-300 pt-4 mt-4">
+                        <strong>Genel Toplam:</strong> <span class="grand-total">{{ number_format($grandTotal, 2) }}₺</span>
+                    </p>
                 </div>
-            @endif
-        </div>
-        <div class="cart-summary w-25 p-3 bg-light rounded ms-3">
-            <h4 class="mb-4">Sepet Özeti</h4>
-            <form action="{{ route('cart.applyCoupon') }}" method="POST" class="mb-3">
-                @csrf
-                <div class="input-group">
-                    <input type="text" name="coupon_code" class="form-control" placeholder="Kupon kodu" required>
-                    <button type="submit" class="btn btn-success">Uygula</button>
-                </div>
-            </form>
 
-            @if(session('applied_coupon'))
-                <p><strong>Kupon:</strong> {{ session('applied_coupon.code') }}
-                    <button class="btn btn-sm btn-outline-danger remove-coupon ms-2">
-                        <i class="fas fa-times"></i> Kaldır
-                    </button></p>
-                <p class="text-success discount-amount"><strong>İndirim:</strong> -{{ number_format(session('applied_coupon.discount'), 2) }}₺</p>
-            @endif
-            @php
-                $shippingCost = 49.90;
-                $isFreeShipping = $totalPrice >= 750;
-                $discount = session('applied_coupon.discount') ?? 0;
-                $grandTotal = $totalPrice - $discount + (!$isFreeShipping ? $shippingCost : 0);
-            @endphp
-
-            <p><strong>Toplam Tutar:</strong> <span id="totalPrice">{{ number_format($totalPrice, 2) }}</span>₺</p>
-            <p><strong>Toplam Adet:</strong> <span id="totalQuantity">{{ $totalQuantity }}</span></p>
-
-            @if($isFreeShipping)
-                <p><strong>Kargo:</strong> <span class="text-muted text-decoration-line-through">{{ number_format($shippingCost, 2) }}₺</span> <span class="text-success">Ücretsiz</span></p>
-            @else
-                <p><strong>Kargo:</strong> {{ number_format($shippingCost, 2) }}₺</p>
-            @endif
-
-            <p><strong>Genel Toplam:</strong> <span class="grand-total">{{ number_format($grandTotal, 2) }}</span>₺</p>
-
-            <form action="{{ route('checkout.index') }}" method="GET">
-                <button type="submit" class="btn btn-primary w-100 rounded-2">İleri</button>
-            </form>
+                <form action="{{ route('checkout.index') }}" method="GET" class="mt-6">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200">
+                        Ödeme Sayfasına İlerle
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="modal fade" id="removeCouponModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Kuponu Kaldır</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div id="removeCouponModal" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-sm mx-auto p-6 relative">
+                <button type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" data-dismiss-modal>
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="text-center">
+                    <i class="fas fa-exclamation-circle text-yellow-500 text-5xl mb-3"></i>
+                    <h5 class="text-xl font-bold text-gray-800 mb-2">Kuponu Kaldır</h5>
+                    <p class="text-gray-600 mb-4">Bu kuponu kaldırmak istediğinize emin misiniz?</p>
+                    <p class="text-gray-400 text-xs mb-4">"{{ session('applied_coupon.code') }}" kodu kaldırılacak.</p>
                 </div>
-                <div class="modal-body">
-                    <i class="fas fa-exclamation-circle text-warning display-5 d-block text-center mb-3"></i>
-                    <p class="text-center">Bu kuponu kaldırmak istediğinize emin misiniz?</p>
-                    <p class="text-muted small text-center">"{{ session('applied_coupon.code') }}" kodu kaldırılacak</p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
-                    <button type="button" class="btn btn-danger" id="confirmRemoveCoupon">Evet, Kaldır</button>
+                <div class="flex justify-center space-x-4">
+                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md transition-colors duration-200" data-dismiss-modal>
+                        Vazgeç
+                    </button>
+                    <button type="button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200" id="confirmRemoveCoupon">
+                        Evet, Kaldır
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
+
     <script>
         $(document).ready(function () {
             toastr.options = {
@@ -113,87 +150,60 @@
                 "positionClass": "toast-top-right",
                 "timeOut": "3000"
             };
+
             $(document).on('click', '.remove-coupon', function() {
-                $('#removeCouponModal').modal('show');
+                $('#removeCouponModal').removeClass('hidden');
             });
 
-// Onay butonu event'i
+            $(document).on('click', '[data-dismiss-modal]', function() {
+                $('#removeCouponModal').addClass('hidden');
+            });
+
             $('#confirmRemoveCoupon').on('click', function() {
-                $('#removeCouponModal').modal('hide');
+                $('#removeCouponModal').addClass('hidden');
 
                 $.post('{{ route("cart.removeCoupon") }}', {
                     _token: '{{ csrf_token() }}'
-                }).done(function(response) {
-                    if(response.success) {
-                        // Başarılı animasyon
-                        $('.cart-summary').prepend(`
-                <div class="alert alert-success alert-dismissible fade show">
-                    ${response.message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `);
-
-                        // Kupon bilgilerini kaldır
-                        $('.discount-amount').remove();
-                        $('.remove-coupon').parent().remove();
-
-                        // Tutarları güncelle
-                        $('#totalPrice').text(response.data.totalPrice + '₺');
-                        $('.grand-total').text(response.data.grandTotal + '₺');
-
-                        // Kargo ücretini güncelle
-                        updateShippingDisplay(response.data.shippingCost);
-
-                        // 3 saniye sonra alert'i kaldır
-                        setTimeout(() => {
-                            $('.alert').alert('close');
-                        }, 3000);
-                    }
-                }).fail(function(xhr) {
-                    $('#removeCouponModal').modal('hide');
-                    toastr.error(xhr.responseJSON?.message || 'Bir hata oluştu');
-                });
+                })
+                    .done(function(response) {
+                        if (response.success) {
+                            location.reload();
+                        }
+                    })
+                    .fail(function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Bir hata oluştu');
+                    });
             });
-            function updateShippingDisplay(shippingCost) {
-                if(parseFloat(shippingCost) > 0) {
-                    $('strong:contains("Kargo:")').parent().html(`
-            <strong>Kargo:</strong> ${shippingCost}₺
-        `);
-                } else {
-                    $('strong:contains("Kargo:")').parent().html(`
-            <strong>Kargo:</strong>
-            <span class="text-muted text-decoration-line-through">49.90₺</span>
-            <span class="text-success">Ücretsiz</span>
-        `);
-                }
-            }
+
             function updateCart(cartId, quantity) {
                 $.post('{{ route("cart.update") }}', {
                     _token: '{{ csrf_token() }}',
                     cart: {
                         [cartId]: { quantity: quantity }
                     }
-                }).done(function (response) {
-                    if (response.success) {
-                        $('#quantity_' + cartId).val(quantity);
-                        $('#totalPrice').text(response.totalPrice + '₺');
-                        $('#totalQuantity').text(response.totalQuantity);
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            $('#quantity_' + cartId).val(quantity);
+                            $('#totalPrice').text(response.totalPrice + '₺');
+                            $('#totalQuantity').text(response.totalQuantity);
 
-                        // Kuponlu toplamı güncelle
-                        if (response.discount > 0) {
-                            $('.discount-amount').text('-' + response.discount + '₺');
+                            if (response.discount > 0) {
+                                $('.discount-amount').text('-' + response.discount + '₺');
+                            }
+                            $('.grand-total').text(response.grandTotal + '₺');
+
+                            updateShippingDisplay(response.shippingCost);
+                            toastr.success('Sepet güncellendi', 'Başarılı');
                         }
-                        $('.grand-total').text(response.grandTotal + '₺');
-
-                        toastr.success('Sepet güncellendi', 'Başarılı');
-                    }
-                }).fail(function (xhr) {
-                    let message = 'Bir hata oluştu.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
-                    }
-                    toastr.error(message, 'Hata');
-                });
+                    })
+                    .fail(function (xhr) {
+                        let message = 'Bir hata oluştu.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        toastr.error(message, 'Hata');
+                    });
             }
 
             let maxStock = {!! json_encode($cartStocks) !!};
@@ -230,108 +240,14 @@
                     if (res.success) location.reload();
                 });
             });
+
+            function updateShippingDisplay(shippingCost) {
+                if(shippingCost > 0) {
+                    $('p:contains("Kargo:")').html(`<strong>Kargo:</strong> ${shippingCost}₺`);
+                } else {
+                    $('p:contains("Kargo:")').html(`<strong>Kargo:</strong> <span class="text-sm text-gray-500 line-through mr-2">49.90₺</span> <span class="text-green-600 font-semibold">Ücretsiz</span>`);
+                }
+            }
         });
     </script>
-@endsection
-
-@section('styles')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-    <style>
-        #removeCouponModal .modal-content {
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        #removeCouponModal .modal-header {
-            border-bottom: none;
-            background: #f8f9fa;
-        }
-
-        #removeCouponModal .modal-footer {
-            border-top: none;
-            padding-top: 0;
-        }
-
-        #removeCouponModal .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            padding: 8px 20px;
-        }
-
-        #removeCouponModal .fa-exclamation-circle {
-            color: #ffc107;
-            font-size: 3rem;
-        }
-        .cart-container {
-            max-width: 1400px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: flex;
-            gap: 20px;
-        }
-        .remove-coupon {
-            padding: 0.15rem 0.3rem;
-            font-size: 0.75rem;
-            vertical-align: middle;
-        }
-
-        .remove-coupon:hover {
-            color: #fff !important;
-        }
-
-        .cart-items {
-            flex: 1;
-        }
-
-        .cart-summary {
-            flex: 0 0 350px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .cart-item {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .quantity-input {
-            text-align: center;
-        }
-
-
-        @media (max-width: 768px) {
-            .cart-container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .cart-items {
-                width: 100%;
-                margin-bottom: 20px;
-            }
-
-            .cart-summary {
-                width: 100%;
-                margin-top: 20px;
-                flex: 0;
-            }
-
-            .cart-item {
-                padding: 10px;
-                font-size: 14px;
-            }
-
-            .cart-item img {
-                width: 80px;
-            }
-
-            .btn-primary {
-                padding: 10px;
-            }
-        }
-    </style>
-@endsection
+@endpush

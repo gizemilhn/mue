@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Collection;
+use App\Models\HomeBanner;
+use App\Models\InstagramPost;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
@@ -15,6 +18,9 @@ class HomeController extends Controller
 
     public function index()
     {
+        $banners = HomeBanner::orderBy('order')->get();
+        $collections = Collection::all();
+        $instagramPosts = InstagramPost::all();
         $categories = Category::all();
         $latestProducts = Product::with('featuredImage')
             ->orderBy('created_at', 'desc')
@@ -25,7 +31,7 @@ class HomeController extends Controller
             ->take(5)
             ->get();
 
-        return view('home.home', compact('latestProducts', 'topStockProducts', 'categories'));
+        return view('home.home', compact('latestProducts', 'topStockProducts', 'categories', 'collections', 'instagramPosts', 'banners'));
     }
     public function home()
     {

@@ -81,5 +81,24 @@ class CouponController extends Controller
         toastr()->closeButton()->success('Kupon Başarıyla Silindi');
         return redirect()->back();
     }
+    public function createAutomaticCoupon($userId)
+    {
+        $couponCode = "MERHABA10";
+
+        $couponData = [
+            'code' => $couponCode,
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+            'min_amount' => 100,
+            'usage_limit' => 1,
+            'expires_at' => null,
+            'user_id' => $userId,
+            'is_active' => true,
+        ];
+
+        Coupon::create($couponData);
+
+        return $couponCode;
+    }
 
 }

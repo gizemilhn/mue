@@ -19,6 +19,7 @@ class Order extends Model
     {
         return $this->hasMany(OrderProducts::class);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -44,4 +45,5 @@ class Order extends Model
     {
         return $this->hasOne(CouponUsage::class,'order_id');
     }
+
 }

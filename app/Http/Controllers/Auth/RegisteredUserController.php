@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Http\Controllers\Admin\CouponController;
 
 class RegisteredUserController extends Controller
 {
@@ -43,10 +44,16 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+
         event(new Registered($user));
 
         Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        $couponController = new CouponController();
+        $couponCode = $couponController->createAutomaticCoupon($user->id);
+        session()->flash('toastr', [
+            'type' => 'success',
+            'message' => 'Kaydınız için teşekkürler! 🎉 %10 indirim kuponunuz: ' . $couponCode
+        ]);
+        return redirect(route('home', absolute: false));
     }
 }

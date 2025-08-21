@@ -42,6 +42,20 @@ class OrderController extends Controller
 
         return view('admin.orders.index', compact('orders'));
     }
+
+    public function show($id)
+    {
+        $order = Order::with([
+            'user',
+            'address',
+            'shipping',
+            'products' => function ($query) {
+                $query->with('product', 'size');
+            }])->findOrFail($id);
+
+        return view('admin.orders.show', compact('order'));
+    }
+
     public function approve(Order $order)
     {
         $trackingNumber = 'TRK' . Str::upper(Str::random(8));

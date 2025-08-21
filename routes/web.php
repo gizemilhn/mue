@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\HomePageController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ReturnController;
@@ -42,7 +43,7 @@ Route::get('contact_us',[HomeController::class, 'contact_us'])->name('contact_us
 Route::post('/contact', [HomeContactController::class, 'store'])->name('contact.submit');
 
 Route::middleware('auth')->namespace('App\Http\Controllers\User')->group(function () {
-    Route::get('/dashboard', [HomeController::class, 'home'])->name('home');
+    Route::get('/home', [HomeController::class, 'home'])->name('home');
     Route::post('/add-to-cart/{product}', [CartController::class, 'addToCart'])->name('add_cart');
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
@@ -116,9 +117,10 @@ Route::middleware('auth')->middleware('admin')->middleware('verified')->prefix('
     Route::get('/admin/users/{user}/edit', [UserController::class, 'editUser'])->name('admin.users.edit');
     Route::put('/admin/{user}', [UserController::class, 'updateUser'])->name('admin.users.update');
 
-    Route::post('/order/{order}/approve', [AdminOrderController::class, 'approve'])->name('order.approve');
+    Route::post('/order/{order}/approve', [AdminOrderController::class, 'approve'])->name('admin.order.approve');
     Route::post('/admin.orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('admin.order.cancel');
     Route::get('/admin/orders/index', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 
     Route::get('/admin/shippings/index', [ShippingController::class, 'index'])->name('admin.shippings.index');
     Route::put('/admin/shippings/index/{shipping}/update-status', [ShippingController::class, 'updateShippingStatus'])->name('admin.shippings.updateStatus');
@@ -140,9 +142,22 @@ Route::middleware('auth')->middleware('admin')->middleware('verified')->prefix('
     Route::put('/admin/coupons/{coupon}', [CouponController::class, 'update'])->name('admin.coupons.update');
     Route::delete('/admin/coupons/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.destroy');
 
-    Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [AdminProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::prefix('anasayfa-yonetimi')->name('admin.content.')->group(function () {
+        Route::get('/', [HomePageController::class, 'index'])->name('index');
+
+        Route::post('banners', [HomePageController::class, 'storeBanner'])->name('banners.store');
+        Route::delete('banners/{banner}', [HomePageController::class, 'destroyBanner'])->name('banners.destroy');
+
+        Route::post('collections', [HomePageController::class, 'storeCollection'])->name('collections.store');
+        Route::delete('collections/{collection}', [HomePageController::class, 'destroyCollection'])->name('collections.destroy');
+
+        Route::post('instagram-posts', [HomePageController::class, 'storeInstagramPost'])->name('instagram.store');
+        Route::delete('instagram-posts/{instagramPost}', [HomePageController::class, 'destroyInstagramPost'])->name('instagram.destroy');
+    });
+
+//    Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
+//    Route::patch('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
+//    Route::delete('/profile', [AdminProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 

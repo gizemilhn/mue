@@ -55,12 +55,14 @@
             <!-- Menü Listesi (Loop ile) -->
             @php
                 $menuItems = [
+                    ['title' => 'İçerik Yönetimi', 'route' => 'admin.content.index', 'icon' => 'content'],
                     ['title' => 'Users', 'route' => 'admin.users.index', 'icon' => 'users'],
                     ['title' => 'Orders', 'route' => 'admin.orders.index', 'icon' => 'orders'],
                     ['title' => 'Shippings', 'route' => 'admin.shippings.index', 'icon' => 'truck'],
                     ['title' => 'Coupons', 'route' => 'admin.coupons.index', 'icon' => 'tag'],
                     ['title' => 'Returns', 'route' => 'admin.returns.index', 'icon' => 'undo'],
                     ['title' => 'İletişim', 'route' => 'admin.contacts.index', 'icon' => 'contact'],
+
                 ];
             @endphp
 

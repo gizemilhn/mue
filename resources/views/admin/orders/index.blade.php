@@ -95,17 +95,24 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($order->total_price, 2) }}₺</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    @if($order->status == 'pending')
-                                        <form action="{{ route('order.approve', $order->id) }}" method="POST" class="inline-block mr-2">
-                                            @csrf
-                                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Onayla</button>
-                                        </form>
+                                    <div class="flex items-center space-x-2">
+                                        @if($order->status == 'pending')
+                                            <form action="{{ route('admin.order.approve', $order->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Onayla</button>
+                                            </form>
 
-                                        <form action="{{ route('admin.order.cancel', $order->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">İptal Et</button>
-                                        </form>
-                                    @endif
+                                            <form action="{{ route('admin.order.cancel', $order->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">İptal Et</button>
+                                            </form>
+                                        @endif
+
+                                        <a href="{{ route('admin.orders.show', $order->id) }}"
+                                           class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center transition-all">
+                                            <i class="fas fa-eye mr-2"></i> Detaylar
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
