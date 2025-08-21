@@ -1,8 +1,8 @@
 @extends('admin.index')
+
 @section('content')
     <div class="p-6">
         <div class="bg-white rounded-lg shadow">
-            <!-- Header Section -->
             <div class="px-6 pt-6 pb-4 border-b border-gray-200">
                 <div class="flex justify-between items-center">
                     <div>
@@ -12,11 +12,10 @@
                 </div>
             </div>
 
-            <!-- Add Category Form -->
             <div class="p-6">
                 <form action="{{route('add.category')}}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Ana Kategori</label>
                             <select name="main_category_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -33,7 +32,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Resmi</label>
-                            <input type="file" name="image" required
+                            <input type="file" name="image"
                                    class="block w-full text-sm text-gray-500
                                   file:mr-4 file:py-2 file:px-4
                                   file:rounded-md file:border-0
@@ -42,6 +41,13 @@
                                   hover:file:bg-blue-100">
                         </div>
                         <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Anasayfada Göster</label>
+                            <select name="is_homepage_visible" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1">Evet</option>
+                                <option value="0">Hayır</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-1">
                             <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
                                 Kategori Ekle
                             </button>
@@ -50,15 +56,15 @@
                 </form>
             </div>
 
-            <!-- Categories Table -->
             <div class="px-6 pb-6">
-                <div class="overflow-x-auto  rounded-lg shadow-sm">
+                <div class="overflow-x-auto rounded-lg shadow-sm">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori Adı</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resim</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Üst Kategori</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Anasayfada Görünürlük</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
                         </tr>
                         </thead>
@@ -77,6 +83,13 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $category->mainCategory->name ?? '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($category->is_homepage_visible)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Görünür</span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Gizli</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                                     <a href="{{route('category.edit',$category->id)}}"

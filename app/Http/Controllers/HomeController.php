@@ -21,7 +21,7 @@ class HomeController extends Controller
         $banners = HomeBanner::orderBy('order')->get();
         $collections = Collection::all();
         $instagramPosts = InstagramPost::all();
-        $categories = Category::all();
+        $categories = Category::where('is_homepage_visible', true)->get();
         $latestProducts = Product::with('featuredImage')
             ->orderBy('created_at', 'desc')
             ->take(5)

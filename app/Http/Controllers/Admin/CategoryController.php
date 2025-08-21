@@ -81,14 +81,16 @@ class CategoryController extends Controller
     {
         $request->validate([
             'category' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'main_category_id' => 'nullable|exists:main_categories,id'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'main_category_id' => 'nullable|exists:main_categories,id',
+            'is_homepage_visible' => 'required|boolean',
         ]);
 
         $category = new Category();
         $category->category_name = $request->category;
         $category->slug = Str::slug($request->category);
         $category->main_category_id = $request->main_category_id;
+        $category->is_homepage_visible = $request->is_homepage_visible;
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('categories', 'public');
@@ -126,11 +128,13 @@ class CategoryController extends Controller
             'category' => 'required|string|max:255',
             'main_category_id' => 'nullable|exists:main_categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_homepage_visible' => 'required|boolean',
         ]);
 
         $category->category_name = $request->category;
         $category->slug = Str::slug($request->category);
         $category->main_category_id = $request->main_category_id;
+        $category->is_homepage_visible = $request->is_homepage_visible;
 
         if ($request->hasFile('image')) {
 
