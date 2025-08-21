@@ -47,7 +47,7 @@ class CartController extends Controller
         $carts = Cart::with(['product.featuredImage', 'size'])->where('user_id', Auth::id())->get();
 
         $totalPrice = $carts->sum(function ($cart) {
-            return $cart->product->price * $cart->quantity;
+            return $cart->product->discountedPrice * $cart->quantity;
         });
 
         $totalQuantity = $carts->sum('quantity');
@@ -85,10 +85,9 @@ class CartController extends Controller
 
             $totalQuantity = $userCarts->sum('quantity');
             $totalPrice = $userCarts->sum(function ($cart) {
-                return $cart->product->price * $cart->quantity;
+                return $cart->product->discountedPrice * $cart->quantity;
             });
 
-            // Kupon indirimini ekleyelim
             $discount = session('applied_coupon.discount') ?? 0;
             $shippingCost = $totalPrice >= 750 ? 0 : 49.90;
             $grandTotal = $totalPrice - $discount + ($totalPrice >= 750 ? 0 : $shippingCost);
@@ -173,7 +172,7 @@ class CartController extends Controller
         return Cart::with('product')
             ->where('user_id', auth()->id())
             ->get()
-            ->sum(fn($item) => $item->product->price * $item->quantity);
+            ->sum(fn($item) => $item->product->discountedPrice * $item->quantity);
     }
 
     private function getUpdatedCartTotals()

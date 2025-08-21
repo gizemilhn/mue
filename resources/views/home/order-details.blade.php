@@ -58,34 +58,43 @@
                                 </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                @foreach($order->products as $product)
+                                @foreach($order->products as $orderProduct)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                @if($product->product->featuredImage)
-                                                    <img src="{{ asset($product->product->featuredImage->image_path) }}"
-                                                         class="w-16 h-16 object-cover rounded mr-3" alt="{{ $product->product->name }}">
+                                                @if($orderProduct->product->featuredImage)
+                                                    <img src="{{ asset($orderProduct->product->featuredImage->image_path) }}"
+                                                         class="w-16 h-16 object-cover rounded mr-3" alt="{{ $orderProduct->product->name }}">
                                                 @endif
                                                 <div>
-                                                    <h6 class="text-sm font-semibold text-gray-800">{{ $product->product->name }}</h6>
-                                                    @if($product->size_id)
-                                                        <small class="text-xs text-gray-500">Beden: {{ $product->product->sizes->firstWhere('id', $product->size_id)?->name }}</small>
+                                                    <h6 class="text-sm font-semibold text-gray-800">{{ $orderProduct->product->name }}</h6>
+                                                    @if($orderProduct->size_id)
+                                                        <small class="text-xs text-gray-500">Beden: {{ $orderProduct->product->sizes->firstWhere('id', $orderProduct->size_id)?->name }}</small>
                                                     @endif
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-500">{{ $product->quantity }}</td>
-                                        <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">{{ number_format($product->price, 2) }}₺</td>
-                                        <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">{{ number_format($product->price * $product->quantity, 2) }}₺</td>
+                                        <td class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-500">{{ $orderProduct->quantity }}</td>
+                                        <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">
+                                            @if($orderProduct->product->price != $orderProduct->product->discountedPrice)
+                                                <span class="text-xs text-gray-500 line-through mr-1">{{ number_format($orderProduct->product->price, 2) }}₺</span>
+                                            @endif
+                                            <span class="font-bold text-gray-800">{{ number_format($orderProduct->product->discountedPrice, 2) }}₺</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">
+                                            {{ number_format($orderProduct->product->discountedPrice * $orderProduct->quantity, 2) }}₺
+                                        </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
                                 <tfoot class="bg-gray-100 border-t border-gray-200">
                                 <tr>
                                     <td colspan="3" class="px-6 py-3 text-right text-sm font-semibold text-gray-800">Ürünler Toplamı:</td>
-                                    <td class="px-6 py-3 text-right text-sm font-semibold text-gray-800">{{ number_format($order->products->sum(function($p) {
-                                            return $p->price * $p->quantity;
-                                        }), 2) }}₺</td>
+                                    <td class="px-6 py-3 text-right text-sm font-semibold text-gray-800">
+                                        {{ number_format($order->products->sum(function($orderProduct) {
+                                            return $orderProduct->product->discountedPrice * $orderProduct->quantity;
+                                        }), 2) }}₺
+                                    </td>
                                 </tr>
                                 @if($order->couponUsage)
                                     <tr>

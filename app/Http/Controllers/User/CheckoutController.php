@@ -94,22 +94,28 @@ class CheckoutController extends Controller
 
         $paymentIntentId = $session->payment_intent;
         $totalFromStripe = $session->amount_total / 100;
-        $productsTotal = $carts->sum(fn($cart) => $cart->product->price * $cart->quantity);
-        $shippingFee = ($totalFromStripe > $productsTotal) ? ($totalFromStripe - $productsTotal) : 0;
+
+        // YENİ EK: Kupon indirimini ve kargo ücretini doğru hesapla
+        $subtotal = $carts->sum(fn($cart) => $cart->product->discountedPrice * $cart->quantity);
+        $couponDiscount = session('applied_coupon.discount') ?? 0;
+        $freeShippingThreshold = 750;
+        $shippingFee = ($subtotal - $couponDiscount < $freeShippingThreshold) ? 49.90 : 0;
+
         $order = null;
 
-        DB::transaction(function () use ($user, $carts, $totalFromStripe, $shippingFee, $address_id, &$order, $paymentIntentId) {
+        DB::transaction(function () use ($user, $carts, $totalFromStripe, $shippingFee, $address_id, &$order, $paymentIntentId, $couponDiscount) {
             // Sipariş oluşturma
             $order = $user->orders()->create([
                 'total_price' => $totalFromStripe,
-                'shipping_price' => $shippingFee,
+                'shipping_price' => $shippingFee, // Buraya doğru kargo ücretini gönder
                 'status' => 'pending',
                 'address_id' => $address_id,
                 'payment_id' => $paymentIntentId,
                 'coupon_id' => session('applied_coupon.id') ?? null,
-                'discount_amount' => session('applied_coupon.discount') ?? 0
+                'discount_amount' => $couponDiscount
             ]);
 
+            // ... (Geri kalan kodlar aynı)
             // Kupon işlemleri
             if (session('applied_coupon')) {
                 $coupon = Coupon::find(session('applied_coupon.id'));

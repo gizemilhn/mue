@@ -54,8 +54,8 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{$product->name}}</td>
                             <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{!!Str::limit($product->description,25)!!}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$product->category}}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$product->price}}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$product->category->category_name ?? 'N/A'}}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{$product->discountedPrice}}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">
                                 @if($product->sizes->count())
                                     <div class="space-y-1">

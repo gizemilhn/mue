@@ -21,7 +21,12 @@
                             </div>
                             <div class="p-4 flex-grow flex flex-col justify-between">
                                 <h5 class="text-lg font-semibold mb-2 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ $product->name }}</h5>
-                                <p class="text-xl font-medium text-gray-600 mt-4">{{ number_format($product->price, 2) }}₺</p>
+                                <p class="text-xl font-medium text-gray-600 mt-4">@if($product->discountedPrice < $product->price)
+                                        <span class="text-gray-600 font-medium line-through mr-2">{{ number_format($product->price, 2) }}₺</span>
+                                        <span class="text-red-600 font-bold">{{ number_format($product->discountedPrice, 2) }}₺</span>
+                                    @else
+                                        <span class="text-gray-600 font-medium">{{ number_format($product->price, 2) }}₺</span>
+                                    @endif</p>
                             </div>
                         </div>
                     </a>

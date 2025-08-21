@@ -14,7 +14,6 @@ class OrderController extends Controller
     public function userOrders()
     {
         $user = Auth::user();
-        $orders = $user->orders;
         $orders = Order::where('user_id', Auth::id())->latest()->get();
         return view('home.orders', compact('orders'));
     }
@@ -39,7 +38,6 @@ class OrderController extends Controller
 
     public function cancel(Order $order)
     {
-        // Siparişin iptal edilebilir olduğunu kontrol et
         if ($order->status !== 'pending') {
             return redirect()->route('user.order.details', $order->id)
                 ->with('error', 'Sadece bekleyen siparişler iptal edilebilir.');
@@ -47,18 +45,12 @@ class OrderController extends Controller
 
         try {
             DB::transaction(function () use ($order) {
-                // Sipariş durumunu güncelle
                 $order->update(['status' => 'cancelled']);
-
-                // Ürün ve stok bilgilerini yükle
                 $order->load('products.product');
-
-                // Stokları geri ekle
                 $order->products->each(function ($item) {
                     if ($item->product) {
                         $item->product->increment('stock', $item->quantity);
                     }
-
                     if ($item->size_id) {
                         DB::table('product_size')
                             ->where('product_id', $item->product_id)
@@ -66,8 +58,6 @@ class OrderController extends Controller
                             ->increment('stock', $item->quantity);
                     }
                 });
-
-                // Kargo bilgisini sil (varsa)
                 if ($order->shipping) {
                     $order->shipping()->delete();
                 }

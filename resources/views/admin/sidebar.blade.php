@@ -62,6 +62,7 @@
                     ['title' => 'Coupons', 'route' => 'admin.coupons.index', 'icon' => 'tag'],
                     ['title' => 'Returns', 'route' => 'admin.returns.index', 'icon' => 'undo'],
                     ['title' => 'İletişim', 'route' => 'admin.contacts.index', 'icon' => 'contact'],
+                    ['title' => 'Discounts', 'route' => 'admin.discounts.index', 'icon' => 'discount'],
 
                 ];
             @endphp

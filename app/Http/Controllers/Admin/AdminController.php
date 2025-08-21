@@ -37,7 +37,7 @@ class AdminController extends Controller
             ->where('product_size.stock', '<=', 5)
             ->get();
         $topCategory = Category::select('categories.category_name', DB::raw('COUNT(orders.id) as sales_count'))
-            ->join('products', 'products.category', '=', 'categories.category_name')
+            ->join('products', 'products.category_id', '=', 'categories.id')
             ->join('order_products', 'order_products.product_id', '=', 'products.id')
             ->join('orders', 'order_products.order_id', '=', 'orders.id')
             ->groupBy('categories.category_name')

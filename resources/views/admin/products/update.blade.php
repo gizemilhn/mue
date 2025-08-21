@@ -51,12 +51,13 @@
                     <label class="block text-sm font-medium text-gray-700">Kategori</label>
                     <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100">
                         @foreach($category as $cat)
-                            <option value="{{$cat->category_name}}" {{ $product->category == $cat->category_name ? 'selected' : '' }}>
+                            <option value="{{$cat->category_name}}" {{ $product->category_id == $cat->id ? 'selected' : '' }}>
                                 {{$cat->category_name}}
                             </option>
                         @endforeach
                     </select>
                 </div>
+
 
                 <!-- Size Selection -->
                 <div class="space-y-2">
@@ -228,7 +229,5 @@
                         });
                 });
             });
-        });
-
     </script>
 @endpush

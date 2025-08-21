@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\Admin\HomePageController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -56,12 +57,15 @@ Route::middleware('auth')->namespace('App\Http\Controllers\User')->group(functio
     Route::post('/user.order/{order}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
     Route::post('/return-request/{order}', [ReturnRequestController::class, 'store'])->name('return.request.store');
     Route::get('/orders', [UserOrderController::class, 'userOrders'])->name('user.orders');
+
     Route::get('/coupons', [UserCouponController::class, 'index'])->name('user.coupons');
+
     Route::get('/address', [AddressController::class, 'userAddress'])->name('user.address');
     Route::post('/address', [AddressController::class, 'storeAddress'])->name('user.address.store');
     Route::get('/edit_address/{id}/edit', [AddressController::class, 'editAddress'])->name('user.address.edit');
     Route::put('/edit_address/{id}', [AddressController::class, 'updateAddress'])->name('user.address.update');
     Route::delete('address/{id}', [AddressController::class, 'destroyAddress'])->name('user.address.destroy');
+
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'storeAddress'])->name('checkout.address.store');
     Route::post('/checkout/stripe', [StripeController::class, 'checkout'])->name('checkout.stripe');
@@ -142,8 +146,15 @@ Route::middleware('auth')->middleware('admin')->middleware('verified')->prefix('
     Route::put('/admin/coupons/{coupon}', [CouponController::class, 'update'])->name('admin.coupons.update');
     Route::delete('/admin/coupons/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.destroy');
 
+    Route::get('discounts', [DiscountController::class, 'index'])->name('admin.discounts.index');
+    Route::get('discounts/create', [DiscountController::class, 'create'])->name('admin.discounts.create');
+    Route::post('discounts', [DiscountController::class, 'store'])->name('admin.discounts.store');
+    Route::get('discounts/{discount}/edit', [DiscountController::class, 'edit'])->name('admin.discounts.edit');
+    Route::put('discounts/{discount}', [DiscountController::class, 'update'])->name('admin.discounts.update');
+    Route::delete('discounts/{discount}', [DiscountController::class, 'destroy'])->name('admin.discounts.destroy');
+
     Route::prefix('anasayfa-yonetimi')->name('admin.content.')->group(function () {
-        Route::get('/', [HomePageController::class, 'index'])->name('index');
+        Route::get('/anasayfa-yonetimi', [HomePageController::class, 'index'])->name('index');
 
         Route::post('banners', [HomePageController::class, 'storeBanner'])->name('banners.store');
         Route::delete('banners/{banner}', [HomePageController::class, 'destroyBanner'])->name('banners.destroy');

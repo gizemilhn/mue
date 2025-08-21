@@ -24,14 +24,29 @@ class ProductController extends Controller
     public function upload_product(Request $request)
     {
         $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'price' => 'required|numeric',
+            'category' => 'required|exists:categories,category_name',
+            'is_published' => 'required|boolean',
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'sizes.*.stock' => 'nullable|integer|min:0',
         ]);
+
+        // Kategori adından ID'yi bul
+        $category = Category::where('category_name', $request->category)->first();
+        if (!$category) {
+            return redirect()->back()->withErrors(['category' => 'Belirtilen kategori bulunamadı.']);
+        }
+
         $product = new Product();
         $product->name = $request->title;
         $product->description = $request->description;
         $product->price = $request->price;
-        $product->category = $request->category;
+        $product->category_id = $category->id; // category yerine category_id kullan
         $product->is_published = $request->is_published;
+
         $totalStock = 0;
         if ($request->has('sizes')) {
             foreach ($request->sizes as $data) {
@@ -69,7 +84,7 @@ class ProductController extends Controller
     public function view_product()
     {
 
-        $products = Product::paginate(5);
+        $products = Product::with('category')->paginate(5);
         return view('admin.products.index', compact('products'));
     }
 
@@ -104,12 +119,16 @@ class ProductController extends Controller
 
     public function edit_product(Request $request, $id)
     {
+        $category = Category::where('category_name', $request->category)->first();
+        if (!$category) {
+            return redirect()->back()->withErrors(['category' => 'Belirtilen kategori bulunamadı.']);
+        }
         $product = Product::find($id);
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->price;
         $product->stock = $request->stock;
-        $product->category = $request->category;
+        $product->category_id = $category->id;
         $product->is_published = $request->is_published;
         $product->save();
         $syncData = [];
@@ -160,16 +179,17 @@ class ProductController extends Controller
     public function product_search(Request $request)
     {
         $search = $request->input('search', '');
-        $query = Product::query();
-
+        $query = Product::with('category');
         if($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('category', 'like', '%' . $search . '%');
+            $category = Category::where('category_name', 'like', '%' . $search . '%')->first();
+            $query->where(function ($q) use ($search ,$category) {
+                $q->where('name', 'like', '%' . $search . '%');
+                if ($category) {
+                    $q->orWhere('category_id', $category->id);
+                }
             });
         }
-
         $products = $query->paginate(5);
         $products->appends(['search' => $search]);
 

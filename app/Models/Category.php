@@ -14,4 +14,8 @@ class Category extends Model
     {
         return $this->belongsTo(MainCategory::class);
     }
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'category', 'category_name');
+    }
 }

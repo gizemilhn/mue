@@ -47,7 +47,14 @@
                                     </div>
                                 </div>
 
-                                <strong class="text-xl font-bold text-green-600 ml-auto mr-4 md:mr-6">{{ number_format($cart->product->price, 2) }}₺</strong>
+                                    <div class="ml-auto mr-4 md:mr-6 text-right">
+                                        @if($cart->product->discountedPrice < $cart->product->price)
+                                            <span class="block text-sm line-through text-gray-500">{{ number_format($cart->product->price, 2) }}₺</span>
+                                            <strong class="block text-xl font-bold text-green-600">{{ number_format($cart->product->discountedPrice, 2) }}₺</strong>
+                                        @else
+                                            <strong class="block text-xl font-bold text-green-600">{{ number_format($cart->product->price, 2) }}₺</strong>
+                                        @endif
+                                    </div>
 
                                 <button class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200 remove-product" data-cart-id="{{ $cart->id }}">Sil</button>
                             </div>

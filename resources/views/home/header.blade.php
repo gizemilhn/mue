@@ -38,7 +38,7 @@
 
         <div class="hidden lg:flex items-center space-x-6 flex-grow justify-end">
             <ul class="flex items-center space-x-6 font-semibold">
-                <li><a class="nav-link hover:text-gray-600 transition-colors" href="{{route('home')}}">Ana Sayfa</a></li>
+                <li><a class="nav-link hover:text-gray-600 transition-colors" href="{{route('index')}}">Ana Sayfa</a></li>
                 <li><a class="nav-link hover:text-gray-600 transition-colors" href="{{route('about_us')}}">Hakkımızda</a></li>
                 <li><a class="nav-link hover:text-gray-600 transition-colors" href="{{ route('new_products') }}">Yeni Gelenler</a></li>
 

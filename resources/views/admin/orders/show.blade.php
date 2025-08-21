@@ -69,8 +69,13 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->size->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->quantity }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->price, 2) }} ₺</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->price * $item->quantity, 2) }} ₺</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                @if($item->product->price != $item->product->discountedPrice)
+                                    <span class="text-xs text-gray-500 line-through mr-1">{{ number_format($item->product->price, 2) }}₺</span>
+                                @endif
+                                <span class="font-bold text-gray-800">{{ number_format($item->product->discountedPrice, 2) }}₺</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->product->discountedPrice * $item->quantity, 2) }} ₺</td>
                         </tr>
                     @endforeach
                     </tbody>

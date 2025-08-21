@@ -64,7 +64,12 @@
                         </div>
                         <div class="p-6 flex justify-between items-center">
                             <span class="product-name font-bold">{{ $product->name }}</span>
-                            <span class="product-price text-gray-500">{{ number_format($product->price, 2) }}₺</span>
+                            <span class="product-price text-gray-500">@if($product->discountedPrice < $product->price)
+                                    <span class="text-gray-600 font-medium line-through mr-2">{{ number_format($product->price, 2) }}₺</span>
+                                    <span class="text-red-600 font-bold">{{ number_format($product->discountedPrice, 2) }}₺</span>
+                                @else
+                                    <span class="text-gray-600 font-medium">{{ number_format($product->price, 2) }}₺</span>
+                                @endif</span>
                         </div>
                     </div>
                 </div>

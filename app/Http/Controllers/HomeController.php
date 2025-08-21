@@ -35,6 +35,9 @@ class HomeController extends Controller
     }
     public function home()
     {
+        $banners = HomeBanner::orderBy('order')->get();
+        $collections = Collection::all();
+        $instagramPosts = InstagramPost::all();
         $user= Auth::user();
         $userid= $user->id;
         $count = Cart::where('user_id',$userid)->count();
@@ -48,7 +51,7 @@ class HomeController extends Controller
             ->take(5)
             ->get();
 
-        return view('home.home', compact('latestProducts', 'topStockProducts', 'categories','count'));
+        return view('home.home', compact('latestProducts', 'topStockProducts', 'categories','count','instagramPosts','banners','collections'));
     }
     public function about_us()
     {
@@ -127,7 +130,7 @@ class HomeController extends Controller
         $category = Category::where('slug', $slug)->firstOrFail();
         $sort = request()->get('sort');
 
-        $query = Product::with('featuredImage')->where('category', $category->category_name);
+        $query = Product::with('featuredImage')->where('category_id', $category->id);
 
         if ($sort === 'price_asc') {
             $query->orderBy('price', 'asc');
